@@ -1,4 +1,3 @@
-# Makefile
 TARGET = kernel.bin
 ISO = myos.iso
 
@@ -8,15 +7,27 @@ AS = nasm
 CFLAGS = -m32 -ffreestanding -O2 -Wall -Wextra
 LDFLAGS = -m elf_i386 -T linker.ld
 
+BUILD_DIR = build
+OBJ_FILES = $(BUILD_DIR)/multiboot_header.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/keyboard.o $(BUILD_DIR)/shell.o
+
 all: $(ISO)
 
-$(TARGET): multiboot_header.o kernel.o
-	$(LD) $(LDFLAGS) -o $@ $^
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
-multiboot_header.o: multiboot_header.asm
+$(TARGET): $(BUILD_DIR) $(OBJ_FILES)
+	$(LD) $(LDFLAGS) -o $@ $(OBJ_FILES)
+
+$(BUILD_DIR)/multiboot_header.o: multiboot_header.asm | $(BUILD_DIR)
 	$(AS) -f elf32 $< -o $@
 
-kernel.o: kernel.c
+$(BUILD_DIR)/kernel.o: kernel.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/keyboard.o: keyboard.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/shell.o: shell.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(ISO): $(TARGET) grub/grub.cfg
@@ -26,4 +37,4 @@ $(ISO): $(TARGET) grub/grub.cfg
 	grub-mkrescue -o $@ iso
 
 clean:
-	rm -rf *.o *.bin iso $(ISO)
+	rm -rf $(BUILD_DIR) *.bin iso $(ISO)
