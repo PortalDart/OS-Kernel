@@ -14,24 +14,7 @@
 #endif
 
 /* Hardware text mode color constants. */
-enum vga_color {
-	VGA_COLOR_BLACK = 0,
-	VGA_COLOR_BLUE = 1,
-	VGA_COLOR_GREEN = 2,
-	VGA_COLOR_CYAN = 3,
-	VGA_COLOR_RED = 4,
-	VGA_COLOR_MAGENTA = 5,
-	VGA_COLOR_BROWN = 6,
-	VGA_COLOR_LIGHT_GREY = 7,
-	VGA_COLOR_DARK_GREY = 8,
-	VGA_COLOR_LIGHT_BLUE = 9,
-	VGA_COLOR_LIGHT_GREEN = 10,
-	VGA_COLOR_LIGHT_CYAN = 11,
-	VGA_COLOR_LIGHT_RED = 12,
-	VGA_COLOR_LIGHT_MAGENTA = 13,
-	VGA_COLOR_LIGHT_BROWN = 14,
-	VGA_COLOR_WHITE = 15,
-};
+
 
 static inline uint8_t vga_entry_color(const enum vga_color fg, const enum vga_color bg) {
 	return fg | bg << 4;
@@ -53,13 +36,16 @@ uint16_t cursor_row = 0;
 uint16_t cursor_column = 0;
 
 
-inline void clear() {
+void clear(const enum vga_color text, const enum vga_color background) {
 	cursor_column = 0;
 	cursor_row = 0;
 
 	for (size_t i = 0;i < VGA_HEIGHT * VGA_WIDTH; i++) {
-		VGA_MEMORY[i] = vga_entry(' ', VGA_COLOR_BLACK);
+		VGA_MEMORY[i] = vga_entry(' ', vga_entry_color(text, background));
 	}
+
+	cursor_column = 0;
+	cursor_row = 0;
 }
 
 void scroll() {
@@ -192,8 +178,19 @@ void printk(const char *buffer, uint8_t text_color, uint8_t background_color) {
 	}
 }
 
+void sleep(size_t time) {
+	for (volatile size_t i = 0;i < 100000000 * time;i++) {
+
+	}
+
+}
+
 int kernel_main() {
-	clear();
+	clear(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+	boot_logo();
+	sleep(1000);
+	clear(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+	printk("myos > ", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 	keyboard();
 	return 0;
 }

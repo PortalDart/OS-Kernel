@@ -8,7 +8,7 @@ CFLAGS = -m32 -ffreestanding -O2 -Wall -Wextra
 LDFLAGS = -m elf_i386 -T linker.ld
 
 BUILD_DIR = build
-OBJ_FILES = $(BUILD_DIR)/multiboot_header.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/keyboard.o $(BUILD_DIR)/shell.o
+OBJ_FILES = $(BUILD_DIR)/multiboot_header.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/keyboard.o $(BUILD_DIR)/shell.o $(BUILD_DIR)/boot_logo.o $(BUILD_DIR)/kernel_panic.o
 
 all: $(ISO)
 
@@ -28,6 +28,12 @@ $(BUILD_DIR)/keyboard.o: keyboard.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/shell.o: shell.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/boot_logo.o: boot_logo.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/kernel_panic.o: kernel_panic.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(ISO): $(TARGET) grub/grub.cfg
