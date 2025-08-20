@@ -64,11 +64,13 @@ void shell(){
     else if (strcmp(buffer, "panic\n") == 0) {
         kernel_panic();
     }
-    else if (strncmp(buffer, "setbackgroundcolor", 9)) {
-        size_t length = strlen(buffer);
-    }
-    else if (strncmp(buffer, "settextcolor", 9)) {
+    else if (strcmp(buffer, "readdisk")) {
+        uint8_t buffer[512];
+        read_disk(2, buffer);
 
+        for (size_t i = 0;i < 512;i++) {
+            char_printk(buffer[i], VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+        }
     }
     else if (strcmp(buffer, "\n") == 0) {
 

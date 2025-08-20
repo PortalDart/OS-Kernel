@@ -187,5 +187,8 @@ int kernel_main() {
 	clear(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 	printk("myos > ", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 	keyboard();
+
+
+
 	return 0;
 }

@@ -1,6 +1,6 @@
 #include <stddef.h>
 #include "kernel.h"
-#include "inb.h"
+#include "io.h"
 
 char ascii[100] = {0};
 

@@ -34,5 +34,7 @@ void shell();
 void boot_logo();
 void sleep(size_t time);
 void kernel_panic();
+void read_disk(uint32_t lba, uint8_t *buffer);
+void write_disk(uint32_t lba, uint8_t *buffer);
 
 #endif
