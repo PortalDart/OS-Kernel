@@ -11,6 +11,19 @@ char buffer[1000];
 
 size_t i = 0;
 
+enum tokens {
+    TOKEN_ECHO,
+    TOKEN_HELP,
+    TOKEN_INFO,
+    TOKEN_PARAMETER,
+    TOKEN_UNKNOWN
+};
+
+struct tokenType {
+    enum tokens tokens;
+    char *parameter;
+};
+
 void command() {
     buffer[i] = character;
     i++;
@@ -29,54 +42,27 @@ void command() {
     }
 }
 
+//shit
+enum tokens get_token(const char *c) {
+    if (strncmp(c, "echo", 4) == 0) {
+        return TOKEN_ECHO;
+    }
+    return TOKEN_UNKNOWN;
+}
+
 void shell(){
-    if (strcmp(buffer, "test\n") == 0) {
-        printk("\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("test\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("myos > ", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-    }
-    else if (strcmp(buffer, "help\n") == 0) {
-        printk("\n", 15, VGA_COLOR_BLACK);
-        printk("------------------------------------------------------\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("| test - test command                                |\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("| help - lists all commands                          |\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("| sysinfo - prints kernel version                    |\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("| clear - clears the screen                          |\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("| panic - tells os to crash, only for testing        |\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("|                                                    |\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("| setcolor - sets text and background color          |\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("| takes 2 parameters first one is text color         |\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("| second one is background color                     |\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("| not implemented yet                                |\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("------------------------------------------------------\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("myos > ", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-    }
-    else if (strcmp(buffer, "sysinfo\n") == 0) {
-        printk("\n", 15, 0);
-        printk("kernel version: 0.0.1\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("myos > ", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-    }
-    else if (strcmp(buffer, "clear\n") == 0) {
-        clear(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        printk("myos > ", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    struct tokenType tokenType;
+
+    char *token = strtok(buffer, " ");
+    char *args = strtok(NULL, "");
+
+    tokenType.tokens = get_token(token);
+    tokenType.parameter = args;
+
+    switch (tokenType.tokens) {
+        case TOKEN_ECHO:
+            printk(args, VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+            break;
     }
 
-    else if (strcmp(buffer, "panic\n") == 0) {
-        kernel_panic();
-    }
-    else if (strcmp(buffer, "readdisk")) {
-        uint8_t buffer[512];
-        read_disk(2, buffer);
-
-        for (size_t i = 0;i < 512;i++) {
-            char_printk(buffer[i], VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-        }
-    }
-    else if (strcmp(buffer, "\n") == 0) {
-
-    }
-    else {
-        printk("invalid command \n", VGA_COLOR_LIGHT_GREY ,VGA_COLOR_BLACK);
-        printk("myos > ", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-    }
 }
