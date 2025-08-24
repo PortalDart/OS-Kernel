@@ -28,7 +28,6 @@ void command() {
     buffer[i] = character;
     i++;
     if (character == '\n') {
-        printk("myos > ", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
         shell();
         for (size_t j = 0; j < i; j++) {
             buffer[j] = 0;
@@ -47,6 +46,12 @@ enum tokens get_token(const char *c) {
     if (strncmp(c, "echo", 4) == 0) {
         return TOKEN_ECHO;
     }
+    else if (strncmp(c, "info", 4) == 0) {
+        return TOKEN_INFO;
+    }
+    else if (strncmp(c, "help", 4) == 0) {
+        return TOKEN_HELP;
+    }
     return TOKEN_UNKNOWN;
 }
 
@@ -62,7 +67,30 @@ void shell(){
     switch (tokenType.tokens) {
         case TOKEN_ECHO:
             printk(args, VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+            goto print;
             break;
+        case TOKEN_UNKNOWN:
+            printk("Unknown command \n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+            printk(token, VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+            goto print;
+            break;
+        case TOKEN_INFO:
+            printk("Kernel version 0.0.2 \n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+            goto print;
+            break;
+        case TOKEN_HELP:
+            printk("#####################################\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+            printk("# echo - prints a string            #\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+            printk("# info - displays kernel version    #\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+            printk("#####################################\n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+            goto print;
+            break;
+        default:
+            goto print;
     }
 
+    print:
+        printk("$ ", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 }
+
+
