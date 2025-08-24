@@ -16,6 +16,8 @@ enum tokens {
     TOKEN_HELP,
     TOKEN_INFO,
     TOKEN_PARAMETER,
+    TOKEN_CLEAR,
+    TOKEN_ENTER,
     TOKEN_UNKNOWN
 };
 
@@ -46,10 +48,16 @@ enum tokens get_token(const char *c) {
     if (strncmp(c, "echo", 4) == 0) {
         return TOKEN_ECHO;
     }
-    else if (strncmp(c, "info", 4) == 0) {
+    else if (strcmp(c, "info\n") == 0) {
         return TOKEN_INFO;
     }
-    else if (strncmp(c, "help", 4) == 0) {
+    else if (strcmp(c, "\n") == 0) {
+        return TOKEN_ENTER;
+    }
+    else if (strcmp(c, "clear\n") == 0) {
+        return TOKEN_CLEAR;
+    }
+    else if (strcmp(c, "help\n") == 0) {
         return TOKEN_HELP;
     }
     return TOKEN_UNKNOWN;
@@ -70,12 +78,19 @@ void shell(){
             goto print;
             break;
         case TOKEN_UNKNOWN:
-            printk("Unknown command \n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+            printk("Unknown command ", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
             printk(token, VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
             goto print;
             break;
         case TOKEN_INFO:
             printk("Kernel version 0.0.2 \n", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+            goto print;
+            break;
+        case TOKEN_CLEAR:
+            clear(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+            goto print;
+            break;
+        case TOKEN_ENTER:
             goto print;
             break;
         case TOKEN_HELP:

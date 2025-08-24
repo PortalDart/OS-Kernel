@@ -5,6 +5,10 @@
 
 extern char character;
 
+#define KERNEL_VERSION_MAJOR 0
+#define KERNEL_VERSION_MINOR 0
+#define KERNEL_VERSION_PATCH 2
+
 enum vga_color {
     VGA_COLOR_BLACK = 0,
     VGA_COLOR_BLUE = 1,
