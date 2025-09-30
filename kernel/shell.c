@@ -43,7 +43,6 @@ void command() {
     }
 }
 
-//shit
 enum tokens get_token(const char *c) {
     if (strncmp(c, "echo", 4) == 0) {
         return TOKEN_ECHO;
