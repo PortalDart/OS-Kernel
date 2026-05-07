@@ -43,7 +43,7 @@ $(ISO): $(TARGET) grub/grub.cfg
 	mkdir -p iso/boot/grub
 	cp $(TARGET) iso/boot/kernel.bin
 	cp grub/grub.cfg iso/boot/grub/grub.cfg
-	grub-mkrescue -o $@ iso
+	i686-elf-grub-mkrescue -o $@ iso
 
 clean:
 	rm -rf $(BUILD_DIR) *.bin iso $(ISO)
