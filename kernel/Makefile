@@ -1,9 +1,9 @@
 TARGET = kernel.bin
 ISO = myos.iso
 
-CC = i386-elf-gcc
-LD = i386-elf-ld
-AS = nasm
+CC = x86_64-elf-gcc
+AS = x86_64-elf-as
+LD = x86_64-elf-ld
 CFLAGS = -m32 -ffreestanding -O2 -Wall -Wextra
 LDFLAGS = -m elf_i386 -T linker.ld
 
