@@ -4,11 +4,11 @@
 #include "kernel.h"
 
 #if defined(__linux__)
-#error "You are not using a cross-compiler, you will most certainly run into trouble"
+#error
 #endif
 
 #if !defined(__i386__)
-#error "This tutorial needs to be compiled with a ix86-elf compiler"
+#error
 #endif
 
 static inline uint8_t vga_entry_color(const enum vga_color fg, const enum vga_color bg) {
@@ -38,7 +38,6 @@ void clear(const enum vga_color text, const enum vga_color background) {
 	for (size_t i = 0;i < VGA_HEIGHT * VGA_WIDTH; i++) {
 		VGA_MEMORY[i] = vga_entry(' ', vga_entry_color(text, background));
 	}
-
 	cursor_column = 0;
 	cursor_row = 0;
 }
@@ -46,7 +45,6 @@ void clear(const enum vga_color text, const enum vga_color background) {
 void scroll() {
 	size_t row = 1;
 	size_t column = 0;
-
 	uint16_t destination_index = (row - 1) * VGA_WIDTH + column;
 	uint16_t index = row * VGA_WIDTH + column;
 
@@ -65,13 +63,10 @@ void scroll() {
 			column++;
 		}
 	}
-
 	row = VGA_HEIGHT - 1;
-
 	for (size_t j = 0;j < VGA_WIDTH;j++) {
 		VGA_MEMORY[((VGA_HEIGHT - 1) * VGA_WIDTH) + j] = vga_entry(' ', VGA_COLOR_BLACK);
 	}
-
 	column = 0;
 	cursor_row = row;
 	cursor_column = column;
@@ -79,7 +74,6 @@ void scroll() {
 
 void char_printk(const char c, size_t text_color, size_t background_color) {
 	uint16_t index = cursor_row * VGA_WIDTH + cursor_column;
-
 	switch (c) {
 		case '\n':
 			cursor_row++;
@@ -98,7 +92,6 @@ void char_printk(const char c, size_t text_color, size_t background_color) {
 			VGA_MEMORY[index] = vga_entry(c, vga_entry_color(text_color, background_color));
 			cursor_column++;
 	}
-
 	if (cursor_row >= VGA_HEIGHT) {
 		scroll();
 		cursor_row = VGA_HEIGHT - 1;
@@ -111,11 +104,8 @@ void char_printk(const char c, size_t text_color, size_t background_color) {
 
 void printk(const char *buffer, uint8_t text_color, uint8_t background_color) {
 	size_t length = strlen(buffer);
-
 	for (size_t i = 0;i < length; i++) {
-
 		uint16_t index = cursor_row * VGA_WIDTH + cursor_column;
-
 		switch (buffer[i]) {
 			case '\n':
 				cursor_column = 0;
@@ -125,7 +115,6 @@ void printk(const char *buffer, uint8_t text_color, uint8_t background_color) {
 				cursor_column = 0;
 				break;
 			case '\t':
-
 				for (size_t j = 0; j < TAB_WIDTH;j++) {
 					VGA_MEMORY[index] = vga_entry(' ', vga_entry_color(text_color, background_color));
 					cursor_column++;
@@ -135,7 +124,6 @@ void printk(const char *buffer, uint8_t text_color, uint8_t background_color) {
 						cursor_column = 0;
 						cursor_row++;
 					}
-
 					if (cursor_row == VGA_HEIGHT) {
 						cursor_row = 0;
 					}
@@ -161,7 +149,6 @@ void printk(const char *buffer, uint8_t text_color, uint8_t background_color) {
 				VGA_MEMORY[index] = vga_entry(buffer[i], vga_entry_color(text_color, background_color));
 				cursor_column++;
 		}
-
 		if (cursor_column == VGA_WIDTH) {
 			cursor_column = 0;
 			cursor_row++;
@@ -177,7 +164,6 @@ void sleep(size_t time) {
 	for (volatile size_t i = 0;i < 100000000 * time;i++) {
 
 	}
-
 }
 
 int kernel_main() {
@@ -186,9 +172,6 @@ int kernel_main() {
 	sleep(1000);
 	clear(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 	printk("$ ", VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-	keyboard();
-
-
-
+	keyboard()
 	return 0;
 }
