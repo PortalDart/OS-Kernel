@@ -53,14 +53,11 @@ char character;
 
 void keyboard() {
     ascii_init();
-    for (;;) {
-        if (inb(KEYBOARD_STATUS_PORT) & 1) {
-            uint8_t byte = inb(KEYBOARD_DATA_PORT);
-            if (!(byte & 0x80)) {
-                char_printk(ascii[byte], VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-                character = ascii[byte];
-                command();
-            }
+    if (inb(KEYBOARD_STATUS_PORT) & 1) {
+        uint8_t byte = inb(KEYBOARD_DATA_PORT);
+        if (!(byte & 0x80)) {
+            character = ascii[byte];
+            command();
         }
     }
 }

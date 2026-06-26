@@ -4,11 +4,12 @@ ISO = myos.iso
 CC = x86_64-elf-gcc
 AS = nasm
 LD = x86_64-elf-ld
-CFLAGS = -m32 -ffreestanding -O2 -Wall -Wextra
+CFLAGS = -m32 -ffreestanding -O2 -Wall -Wextra -mno-sse -mno-sse2
 LDFLAGS = -m elf_i386 -T linker.ld
 
 BUILD_DIR = build
-OBJ_FILES = $(BUILD_DIR)/multiboot_header.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/disk.o $(BUILD_DIR)/keyboard.o $(BUILD_DIR)/shell.o $(BUILD_DIR)/boot_logo.o $(BUILD_DIR)/kernel_panic.o
+OBJ_FILES = $(BUILD_DIR)/multiboot_header.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/disk.o $(BUILD_DIR)/keyboard.o $(BUILD_DIR)/shell.o $(BUILD_DIR)/boot_logo.o $(BUILD_DIR)/kernel_panic.o $(BUILD_DIR)/string.o $(BUILD_DIR)/sound.o
+
 
 all: $(ISO)
 
@@ -37,6 +38,12 @@ $(BUILD_DIR)/boot_logo.o: boot_logo.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/kernel_panic.o: kernel_panic.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/string.o: string.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/sound.o: sound.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(ISO): $(TARGET) grub/grub.cfg

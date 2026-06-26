@@ -43,30 +43,55 @@
 #define IDE_DRIVE_MASTER 0xE0  // Select master drive
 #define IDE_DRIVE_SLAVE  0xF0  // Select slave drive
 
-
-void wait_disk() {
-    while (inb(IDE_STATUS) & IDE_STATUS_BSY);
-    while (!(inb(IDE_STATUS) & IDE_STATUS_DRQ));
+static inline void ide_delay() {
+    inb(0x3F6);
+    inb(0x3F6);
+    inb(0x3F6);
+    inb(0x3F6);
 }
 
-void write_disk(uint32_t lba, uint8_t *buffer) {
+// Wait for BSY to clear (used after flush/non-data commands)
+int wait_disk_ready() {
+    uint8_t status;
+    while ((status = inb(IDE_STATUS)) & IDE_STATUS_BSY);
+    if (status & (IDE_STATUS_ERR | IDE_STATUS_DF)) return -1;
+    return 0;
+}
+
+// Wait for BSY to clear and DRQ to be set (used before data transfer)
+int wait_disk() {
+    uint8_t status;
+    while ((status = inb(IDE_STATUS)) & IDE_STATUS_BSY);
+    if (status & (IDE_STATUS_ERR | IDE_STATUS_DF)) return -1;
+    while (!((status = inb(IDE_STATUS)) & IDE_STATUS_DRQ)) {
+        if (status & (IDE_STATUS_ERR | IDE_STATUS_DF)) return -1;
+    }
+    return 0;
+}
+
+int write_disk(uint32_t lba, uint8_t *buffer) {
+    outb(IDE_DRIVE_HEAD, IDE_DRIVE_MASTER | ((lba >> 24) & 0x0F));
+    ide_delay();
     outb(IDE_SECTOR_CNT, 1);
     outb(IDE_LBA_LOW, (uint8_t)(lba & 0xFF));
     outb(IDE_LBA_MID, (uint8_t)(lba >> 8));
     outb(IDE_LBA_HIGH, (uint8_t)(lba >> 16));
     outb(IDE_DRIVE_HEAD, IDE_DRIVE_MASTER | ((lba >> 24) & 0x0F));
-
     outb(IDE_STATUS, IDE_CMD_WRITE_SECTORS);
-
-    wait_disk();
-
+    if(wait_disk() != 0) {
+        return -1;
+    }
     for (size_t i = 0; i < WORD_COUNT; i++) {
         outw(IDE_DATA, ((uint16_t *)buffer)[i]);
     }
 
+    outb(IDE_STATUS, 0xE7);
+    return wait_disk_ready();
 }
 
-void read_disk(uint32_t lba, uint8_t *buffer) {
+int read_disk(uint32_t lba, uint8_t *buffer) {
+    outb(IDE_DRIVE_HEAD, IDE_DRIVE_MASTER | ((lba >> 24) & 0x0F));
+    ide_delay();
     outb(IDE_SECTOR_CNT, 1);
     outb(IDE_LBA_LOW, (uint8_t)(lba & 0xFF));
     outb(IDE_LBA_MID, (uint8_t)(lba >> 8));
@@ -79,5 +104,5 @@ void read_disk(uint32_t lba, uint8_t *buffer) {
     for (size_t i = 0; i < WORD_COUNT; i++) {
         ((uint16_t *)buffer)[i] = inw(IDE_DATA);
     }
-
+    return 0;
 }

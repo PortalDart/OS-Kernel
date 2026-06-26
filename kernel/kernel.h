@@ -38,7 +38,11 @@ void shell();
 void boot_logo();
 void sleep(size_t time);
 void kernel_panic();
-void read_disk(uint32_t lba, uint8_t *buffer);
-void write_disk(uint32_t lba, uint8_t *buffer);
+int read_disk(uint32_t lba, uint8_t *buffer);
+int write_disk(uint32_t lba, uint8_t *buffer);
+void fill();
+void beep(uint32_t freq);
+void stop_beep();
+
 
 #endif
